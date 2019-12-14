@@ -30,18 +30,8 @@ fn main() {
 
     // TODO: do i need to use instance methods?
 
-    let command = SystemState;
-    let string = serde_json::to_string(&command.run_on(&mut bridge).body);
-    let res: HashMap<String, Value> = serde_json::from_str(&string.unwrap()).unwrap();
-    for key in res.keys() {
-        println!("{:?}", key)
-    }
-
-    // println!("{:?}", res);
-    // let res: HashMap<String, Value> = serde_json::from_str().unwrap();
-    // for i in res.into_iter() {
-    //     println!("{}:{:?}", i.0, i.1)
-    // }
+    let command = LightNames;
+    command.retrieve_show(&mut bridge)
 }
 
 #[derive(Serialize, Deserialize)]

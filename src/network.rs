@@ -14,7 +14,7 @@ pub struct Request {
     pub params: Option<HashMap<String, String>>,
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Response {
     pub code: http::status::StatusCode,
     pub body: serde_json::value::Value,

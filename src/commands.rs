@@ -1,10 +1,11 @@
 use crate::components::*;
 use crate::network::*;
-use serde_json::json;
+use serde_json::{json, value::Value};
 use std::collections::HashMap;
 use std::thread::sleep;
 use std::time::Duration;
 
+// Basic hello world to the api
 pub struct Info;
 
 impl Command for Info {
@@ -17,9 +18,10 @@ impl Command for Info {
     }
 }
 
-pub struct SystemState;
+// Get lights
+pub struct LightNames;
 
-impl Command for SystemState {
+impl Command for LightNames {
     fn generate_request(&self, key: Option<&String>) -> Request {
         Request {
             request_type: RequestType::Get,
@@ -29,6 +31,22 @@ impl Command for SystemState {
     }
 }
 
+impl Retriever<Vec<String>> for LightNames {
+    fn retrieve(&self, bridge: &mut Bridge) -> Vec<String> {
+        let string = serde_json::to_string(&self.run_on(bridge).body);
+        let res: HashMap<String, Value> = serde_json::from_str(&string.unwrap()).unwrap();
+        let keys: Vec<String> = res.keys().cloned().collect();
+        keys
+    }
+    fn retrieve_show(&self, bridge: &mut Bridge) {
+        println!("Currently found lights are:");
+        for key in self.retrieve(bridge) {
+            println!("{}", key)
+        }
+    }
+}
+
+// Register oneself with the lights
 pub struct Register {
     pub username: String,
     pub appname: String,
@@ -68,9 +86,14 @@ impl Command for Register {
     }
 }
 
+// Command Trait
 pub trait Command {
     fn generate_request(&self, key: Option<&String>) -> Request;
     fn run_on(&self, bridge: &mut Bridge) -> Response {
+        let response = self.send(bridge);
+        response
+    }
+    fn run_mut_on(&mut self, bridge: &mut Bridge) -> Response {
         let response = self.send(bridge);
         println!("{}", response);
         response
@@ -118,3 +141,14 @@ pub trait Command {
         }
     }
 }
+
+pub trait Retriever<T>: Command {
+    fn retrieve(&self, bridge: &mut Bridge) -> T;
+    fn retrieve_show(&self, bridge: &mut Bridge);
+}
+// let string = serde_json::to_string(&response.body);
+// // TODO: transcode for speed
+// let res: HashMap<String, Value> = serde_json::from_str(&string.unwrap()).unwrap();
+// // for key in res.keys() {
+// //     println!("{:?}", key)
+// }
