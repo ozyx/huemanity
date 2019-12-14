@@ -1,0 +1,21 @@
+[package]
+name = "huemanity"
+version = "0.1.0"
+authors = ["Finnkauski <iwiivi@gmail.com>"]
+edition = "2018"
+
+[dependencies]
+clap = "*"
+reqwest = "*"
+serde_json = "*"
+serde = "*"
+http = "*"
+dotenv = "*"
+
+[lib]
+name = "huemanity"
+path = "src/lib.rs"
+
+[[bin]]
+name = "huemanity"
+path = "src/bin.rs"
