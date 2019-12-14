@@ -5,6 +5,9 @@ mod network;
 use commands::*;
 use components::Bridge;
 use serde::{Deserialize, Serialize};
+use serde_json;
+use serde_json::Value;
+use std::collections::HashMap;
 
 use dotenv;
 use std::env;
@@ -26,11 +29,19 @@ fn main() {
     }
 
     // TODO: do i need to use instance methods?
-    let command = GetLights;
-    println!("{}", command.run_on(&mut bridge));
 
-    let command = GetLights;
-    println!("{}", command.run_on(&mut bridge));
+    let command = SystemState;
+    let string = serde_json::to_string(&command.run_on(&mut bridge).body);
+    let res: HashMap<String, Value> = serde_json::from_str(&string.unwrap()).unwrap();
+    for key in res.keys() {
+        println!("{:?}", key)
+    }
+
+    // println!("{:?}", res);
+    // let res: HashMap<String, Value> = serde_json::from_str().unwrap();
+    // for i in res.into_iter() {
+    //     println!("{}:{:?}", i.0, i.1)
+    // }
 }
 
 #[derive(Serialize, Deserialize)]

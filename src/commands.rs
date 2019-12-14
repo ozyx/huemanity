@@ -17,9 +17,9 @@ impl Command for Info {
     }
 }
 
-pub struct GetLights;
+pub struct SystemState;
 
-impl Command for GetLights {
+impl Command for SystemState {
     fn generate_request(&self, key: Option<&String>) -> Request {
         Request {
             request_type: RequestType::Get,
@@ -50,7 +50,7 @@ impl Command for Register {
         }
     }
     fn run_on(&self, bridge: &mut Bridge) -> Response {
-        let mut check = |r: &Response| r.body[0]["error"]["type"] == json!(101);
+        let check = |r: &Response| r.body[0]["error"]["type"] == json!(101);
         let mut resp = self.send(bridge);
 
         while check(&resp) {
