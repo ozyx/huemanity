@@ -2,12 +2,12 @@ use http;
 use std::collections::HashMap;
 use std::fmt::Display;
 
+#[derive(PartialEq)]
 pub enum RequestType {
     Get,
     Post,
     Put,
 }
-
 pub struct Request {
     pub request_type: RequestType,
     pub uri: String,
@@ -30,3 +30,5 @@ impl Display for Response {
         )
     }
 }
+
+fn send(uri: String, req_type: RequestType, params: Option<HashMap<String, String>>) -> Response {}

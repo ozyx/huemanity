@@ -3,8 +3,7 @@ mod components;
 mod network;
 
 use commands::*;
-use components::Bridge;
-use serde::{Deserialize, Serialize};
+use components::*;
 use serde_json;
 use serde_json::Value;
 use std::collections::HashMap;
@@ -28,24 +27,19 @@ fn main() {
         println!("Registered on bridge:\n{}", bridge);
     }
 
-    // TODO: do i need to use instance methods?
+    // TODO: do i need to use instance methods? most likely yes
 
     let command = LightNames;
-    command.retrieve_show(&mut bridge)
+    command.retrieve_show(&mut bridge);
+
+    let command = GetLights;
+    let lights = command.retrieve(&mut bridge);
 }
 
-#[derive(Serialize, Deserialize)]
-struct LightState {
-    num: u8,
-    on: bool,
-    bri: u8,
-    hue: u32,
-    sat: u8,
-    effect: String,
-    xy: (f32, f32),
-    ct: u32,
-    alert: String,
-    colormode: String,
-    mode: String,
-    reachable: bool,
+fn turn_on_all(lights: HashMap<u8, Light>) {
+    for (which, light) in lights.iter() {
+        let string_state = serde_json::to_string(&light.state);
+        let new: HashMap<String, String> =
+            serde_json::from_str(string_state.as_ref().unwrap()).unwrap();
+    }
 }

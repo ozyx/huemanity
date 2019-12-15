@@ -9,7 +9,7 @@ use std::time::Duration;
 pub struct Info;
 
 impl Command for Info {
-    fn generate_request(&self, key: Option<&String>) -> Request {
+    fn generate_request(&self, _key: Option<&String>) -> Request {
         Request {
             request_type: RequestType::Get,
             uri: "api/newdeveloper".to_owned(),
@@ -18,7 +18,51 @@ impl Command for Info {
     }
 }
 
-// Get lights
+// Change state
+pub struct ChangeState {
+    light: u8,
+}
+
+impl Command for ChangeState {
+    fn generate_request(&self, key: Option<&String>) -> Request {
+        Request {
+            request_type: RequestType::Get,
+            uri: format!("api/{}/lights/{}", key.unwrap(), self.light),
+            params: None,
+        }
+    }
+}
+
+// Get light names
+pub struct GetLights;
+
+impl Command for GetLights {
+    fn generate_request(&self, key: Option<&String>) -> Request {
+        Request {
+            request_type: RequestType::Get,
+            uri: format!("api/{}/lights", key.unwrap()),
+            params: None,
+        }
+    }
+}
+
+impl Retriever<HashMap<u8, Light>> for GetLights {
+    fn retrieve(&self, bridge: &mut Bridge) -> HashMap<u8, Light> {
+        // TODO: Transcode
+        let string = serde_json::to_string(&self.run_on(bridge).body);
+        let res: HashMap<u8, Light> = serde_json::from_str(&string.unwrap()).unwrap();
+        res
+    }
+    fn retrieve_show(&self, bridge: &mut Bridge) {
+        let l: HashMap<u8, Light> = self.retrieve(bridge);
+
+        for (name, light) in l.iter() {
+            println!("Light: {}\n{:#?}", name, light.state)
+        }
+    }
+}
+
+// Get light names
 pub struct LightNames;
 
 impl Command for LightNames {
@@ -53,7 +97,7 @@ pub struct Register {
 }
 
 impl Command for Register {
-    fn generate_request(&self, key: Option<&String>) -> Request {
+    fn generate_request(&self, _key: Option<&String>) -> Request {
         let mut map: HashMap<String, String> = HashMap::new();
         // TODO: too many conversions
         map.insert(
@@ -88,19 +132,29 @@ impl Command for Register {
 
 // Command Trait
 pub trait Command {
+    fn generate_with_params(
+        &self,
+        key: Option<&String>,
+        params: HashMap<String, String>,
+    ) -> Request {
+        let mut request = self.generate_request(key);
+        if request.request_type != RequestType::Get {
+            request.params = Some(params);
+        }
+        request
+    }
     fn generate_request(&self, key: Option<&String>) -> Request;
-    fn run_on(&self, bridge: &mut Bridge) -> Response {
-        let response = self.send(bridge);
+    fn run(&self, bridge: &mut Bridge, params: Option<HashMap<String, String>>) -> Response {
+        let response = self.send(bridge, params);
         response
     }
-    fn run_mut_on(&mut self, bridge: &mut Bridge) -> Response {
-        let response = self.send(bridge);
-        println!("{}", response);
-        response
-    }
-    fn send(&self, bridge: &mut Bridge) -> Response {
+    fn send(&self, bridge: &mut Bridge, params: Option<HashMap<String, String>>) -> Response {
         let key = bridge.key.as_ref();
-        let request = self.generate_request(key);
+        let request = if params.is_some() {
+            self.generate_with_params(key, params.unwrap())
+        } else {
+            self.generate_request(key)
+        };
         let uri: String = format!("http://{}/{}", bridge.ip, request.uri);
         match request.request_type {
             RequestType::Post => {
