@@ -1,45 +1,26 @@
-mod commands;
-mod components;
-mod network;
+mod lib;
 
-use commands::*;
-use components::*;
-use serde_json;
-use serde_json::Value;
-use std::collections::HashMap;
-
-use dotenv;
+use lib::*;
 use std::env;
+
+use serde_json::json;
 
 fn main() {
     dotenv::dotenv().ok();
-    let mut bridge = Bridge {
-        ip: env::var("IP").unwrap(),
-        key: Some(env::var("KEY").unwrap()),
-    };
+    // let on = match env::var("SW").unwrap().as_ref() {
+    //     "ON" => true,
+    //     "OFF" => false,
+    //     _ => false,
+    // };
 
-    if bridge.key.is_none() {
-        let command = Register {
-            username: "artie_fartie".to_string(),
-            appname: "hue_stuff_rust".to_string(),
-        };
-        println!("{}", command.run_on(&mut bridge));
-        println!("Registered on bridge:\n{}", bridge);
-    }
+    let ip = env::var("IP").unwrap();
+    let key = env::var("KEY").unwrap();
 
-    // TODO: do i need to use instance methods? most likely yes
+    let bridge = Bridge::link(ip, key);
 
-    let command = LightNames;
-    command.retrieve_show(&mut bridge);
-
-    let command = GetLights;
-    let lights = command.retrieve(&mut bridge);
-}
-
-fn turn_on_all(lights: HashMap<u8, Light>) {
-    for (which, light) in lights.iter() {
-        let string_state = serde_json::to_string(&light.state);
-        let new: HashMap<String, String> =
-            serde_json::from_str(string_state.as_ref().unwrap()).unwrap();
-    }
+    // TODO: make name detection automatic
+    // TODO: add usage of structs for state
+    bridge.state_mult(vec![1, 2, 3], &json!({"on":false, "transitiontime":1}));
+    std::thread::sleep(std::time::Duration::from_secs(1));
+    bridge.state_mult(vec![1, 2, 3], &json!({"on":true, "transitiontime":1}));
 }
