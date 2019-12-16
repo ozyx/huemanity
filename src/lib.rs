@@ -5,6 +5,18 @@ use std::collections::HashMap;
 
 #[derive(Debug)]
 pub struct Bridge {
+    /// The bridge struct represents a HUE bridge.
+    /// The constructor for this struct `link`, tries to
+    /// detect the light id's and is able to send new state to either
+    /// a single light or all of the ones detected.
+    ///
+    /// Currently to register a new bridge, you need to know 2 things:
+    /// - the internal IP of the bridge (in future i'll implement ssdp)
+    /// - the key assigned to you by the `api/newdeveloper` POST request
+    ///   see the documentation for the HUE API in order to see this.
+    ///   I will implement the authentication handshake request flow in
+    ///   the near future and in the CLI I will cache the key somewhere
+    ///
     pub ip: String,
     pub key: String,
     pub client: reqwest::Client,
@@ -16,6 +28,7 @@ pub struct Bridge {
 impl Bridge {
     /// Struct constructor that sets up the required interactions
     /// and also gets us the light id's as well as how many there are
+    ///
     pub fn link(ip: String, key: String) -> Self {
         let client = reqwest::Client::new();
         let base_url = format!("http://{}/api/{}/", ip, key);
