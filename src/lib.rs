@@ -10,9 +10,12 @@ pub struct Bridge {
     pub client: reqwest::Client,
     pub base_url: String,
     pub light_ids: Vec<u8>,
+    pub n_lights: u8,
 }
 
 impl Bridge {
+    /// Struct constructor that sets up the required interactions
+    /// and also gets us the light id's as well as how many there are
     pub fn link(ip: String, key: String) -> Self {
         let client = reqwest::Client::new();
         let base_url = format!("http://{}/api/{}/", ip, key);
@@ -22,12 +25,19 @@ impl Bridge {
             client,
             base_url,
             light_ids: Vec::new(),
+            n_lights: 0,
         };
 
-        println!("{:?}", bridge.collect_ids());
+        // collect the id's it can find on the network
+        bridge.collect_ids();
+
+        // figure out how many lights we have
+        bridge.n_lights = bridge.light_ids.len() as u8;
+
         bridge
     }
 
+    /// Sends the a request with set parameters to the HUE API endpoint
     pub fn send(
         &self,
         endpoint: &str,
@@ -43,6 +53,7 @@ impl Bridge {
         Ok(response)
     }
 
+    /// Given a light and a required state, send this state to the light.
     pub fn state(&self, light: u8, state: &Value) -> Result<(), Box<dyn std::error::Error>> {
         self.send(
             &format!("lights/{}/state", light),
@@ -52,6 +63,7 @@ impl Bridge {
         Ok(())
     }
 
+    /// Given a state send it to all lights found on bridge
     pub fn state_all(&self, state: &Value) -> Result<(), Box<dyn std::error::Error>> {
         for light in self.light_ids.iter() {
             self.state(*light, state)?;
@@ -59,6 +71,7 @@ impl Bridge {
         Ok(())
     }
 
+    /// Collect all found light ids
     pub fn collect_ids(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         let endpoint = "lights";
         let map: HashMap<u8, Value> = self.send(&endpoint, RequestType::Get, None)?.json()?;

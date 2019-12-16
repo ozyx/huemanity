@@ -20,4 +20,5 @@ fn main() {
     bridge.state_all(&json!({"xy":[0.0,0.0],"transitiontime":1}));
 }
 
+// TODO: add a nice way to print out names for the lights like in the hue cli from node
 // TODO: add usage of structs for state
