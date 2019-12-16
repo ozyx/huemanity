@@ -1,5 +1,7 @@
 mod lib;
 
+extern crate serde_json;
+
 use lib::*;
 use std::env;
 

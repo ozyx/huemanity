@@ -1,6 +1,6 @@
 extern crate serde;
 extern crate serde_json;
-use serde_json::{json, value::Value};
+use serde_json::value::Value;
 
 pub struct Bridge {
     pub ip: String,
