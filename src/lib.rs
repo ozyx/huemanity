@@ -1,4 +1,5 @@
-use serde::{Deserialize, Serialize};
+extern crate serde;
+extern crate serde_json;
 use serde_json::{json, value::Value};
 
 pub struct Bridge {
