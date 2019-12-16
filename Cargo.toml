@@ -9,12 +9,12 @@ documentation="https://github.com/finnkauski/huemanity"
 repository="https://github.com/finnkauski/huemanity"
 
 [dependencies]
-clap = "*"
-reqwest = "*"
-serde_json = "*"
-serde = "*"
-http = "*"
-dotenv = "*"
+clap = "2.33.0"
+reqwest = "0.9.24"
+serde_json = "1.0.44"
+serde = "1.0.103"
+http = "0.1.21"
+dotenv = "0.15.0"
 
 [lib]
 name = "huemanity"

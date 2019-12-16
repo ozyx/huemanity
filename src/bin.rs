@@ -10,13 +10,14 @@ use serde_json::json;
 fn main() {
     dotenv::dotenv().ok();
 
-    let ip = env::var("IP").unwrap();
-    let key = env::var("KEY").unwrap();
-    let bri: u16 = env::var("BRI").unwrap().parse().unwrap();
+    let ip = env::var("HUE_IP").unwrap();
+    let key = env::var("HUE_KEY").unwrap();
+    // let bri: u16 = env::var("BRI").unwrap().parse().unwrap();
 
     let bridge = Bridge::link(ip, key);
 
-    // TODO: make name detection automatic
-    // TODO: add usage of structs for state
-    bridge.state_mult(vec![1, 2, 3], &json!({"bri":bri,"transitiontime":1}));
+    println!("{:?}", bridge);
+    bridge.state_all(&json!({"xy":[0.0,0.0],"transitiontime":1}));
 }
+
+// TODO: add usage of structs for state
