@@ -2,7 +2,11 @@
 name = "huemanity"
 version = "0.1.0"
 authors = ["Finnkauski <iwiivi@gmail.com>"]
-edition = "2018"
+description="A simple wrapper and CLI for the Phillips Hue lights."
+license="GNU GPLv3"
+homepage=""
+documentation=""
+repository="https://github.com/finnkauski/huemanity"
 
 [dependencies]
 clap = "*"
