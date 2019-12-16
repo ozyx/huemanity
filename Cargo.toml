@@ -5,7 +5,7 @@ authors = ["Finnkauski <iwiivi@gmail.com>"]
 description="A simple wrapper and CLI for the Phillips Hue lights."
 license="GNU GPLv3"
 homepage="https://github.com/finnkauski/huemanity"
-documentation=""
+documentation="https://github.com/finnkauski/huemanity"
 repository="https://github.com/finnkauski/huemanity"
 
 [dependencies]
