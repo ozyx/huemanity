@@ -4,7 +4,7 @@ version = "0.1.0"
 authors = ["Finnkauski <iwiivi@gmail.com>"]
 description="A simple wrapper and CLI for the Phillips Hue lights."
 license="GNU GPLv3"
-homepage=""
+homepage="https://github.com/finnkauski/huemanity"
 documentation=""
 repository="https://github.com/finnkauski/huemanity"
 
