@@ -43,6 +43,7 @@ impl Bridge {
         };
 
         // collect the id's it can find on the network
+        // TODO: handle this to show that no lights were found
         bridge.collect_ids();
 
         // figure out how many lights we have
