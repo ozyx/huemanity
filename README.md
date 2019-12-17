@@ -9,13 +9,15 @@ future project. That said, if you have your app key registered with the bridge
 and you know you HUE bridge IP on your local network, you can use the `Bridge`
 struct to send a `json!` made state change to your lights.
 
-Any PR's are welcome.
-
 I stream the development of this on [twitch.tv](https://www.twitch.tv/finnkauski)
+
+## For more info:
+This follows closely (basically wraps) the interactions described in the
+[hue API get-started post](https://developers.meethue.com/develop/get-started-2/).
 
 ## In development
 
-- CLI wrapper binary for the tool
+- CLI wrapper binary for the tool to turn this into something people can use
 - Automated registration with the bridge using `ssdp`
 - Tests and documentations
 
