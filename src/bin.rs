@@ -40,18 +40,10 @@ fn main() {
             }
         }
     }
-    // let bri: u16 = env::var("BRI").unwrap().parse().unwrap();
-
-    // println!("{:?}", bridge);
-    bridge.state_all(&json!({"on":false, "hue":3000,"transitiontime":1}));
-    bridge.state_all(&json!({"on":true, "hue":3000,"transitiontime":1}));
-    // bridge.light_info();
 }
 // TODO: implement the clap cli
 //     // TODO: add file tracking
-// TODO: consider using the form method rather than passing json
-// TODO: make command sending async as this is quite inconsistent -> prerelease reqwests
-// TODO: implement display for bridge
+// TODO: make command sending async as this is quite inconsistent -> prerelease reqwests // Use stream
 // TODO: add functionality to detect ip and register new app automatically
 // TODO: add translation of color spaces to whatever the format in the API states
 // TODO: at least add the registration if not the ssdp ip detection

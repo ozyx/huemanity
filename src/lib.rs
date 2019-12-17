@@ -2,6 +2,7 @@ extern crate serde;
 extern crate serde_json;
 use serde_json::value::Value;
 use std::collections::HashMap;
+use std::fmt;
 
 #[derive(Debug)]
 pub struct Bridge {
@@ -46,7 +47,7 @@ impl Bridge {
 
         // figure out how many lights we have
         bridge.n_lights = bridge.light_ids.len() as u8;
-
+        println!("Connected to:\n{}", bridge);
         bridge
     }
 
@@ -105,6 +106,18 @@ impl Bridge {
         for id in self.light_ids.iter() {
             println!("{}", id)
         }
+    }
+}
+
+impl fmt::Display for Bridge {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        // pub ip: String,
+        // pub key: String,
+        // pub client: reqwest::Client,
+        // pub base_url: String,
+        // pub light_ids: Vec<u8>,
+        // pub n_lights: u8,
+        write!(f, "bridge: {}\nlights: {:?}", self.ip, self.light_ids)
     }
 }
 
