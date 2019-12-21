@@ -1,5 +1,7 @@
 extern crate serde;
 extern crate serde_json;
+
+use reqwest::Client;
 use serde_json::value::Value;
 use std::collections::HashMap;
 use std::fmt;
@@ -20,7 +22,7 @@ pub struct Bridge {
     ///
     pub ip: String,
     pub key: String,
-    pub client: reqwest::Client,
+    pub client: Client,
     pub base_url: String,
     pub light_ids: Vec<u8>,
     pub n_lights: u8,
@@ -31,7 +33,7 @@ impl Bridge {
     /// and also gets us the light id's as well as how many there are
     ///
     pub fn link(ip: String, key: String) -> Self {
-        let client = reqwest::Client::new();
+        let client = Client::new();
         let base_url = format!("http://{}/api/{}/", ip, key);
         let mut bridge = Bridge {
             ip,

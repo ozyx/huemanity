@@ -7,6 +7,7 @@ license="AGPL-3.0-or-later"
 homepage="https://github.com/finnkauski/huemanity"
 documentation="https://github.com/finnkauski/huemanity"
 repository="https://github.com/finnkauski/huemanity"
+edition="2018"
 
 [dependencies]
 clap = "2.33.0"
