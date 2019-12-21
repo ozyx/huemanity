@@ -112,12 +112,6 @@ impl Bridge {
 
 impl fmt::Display for Bridge {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        // pub ip: String,
-        // pub key: String,
-        // pub client: reqwest::Client,
-        // pub base_url: String,
-        // pub light_ids: Vec<u8>,
-        // pub n_lights: u8,
         write!(f, "bridge: {}\nlights: {:?}", self.ip, self.light_ids)
     }
 }

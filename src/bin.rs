@@ -50,3 +50,4 @@ fn main() {
 // TODO: add a nice way to print out information about the system or lights and maybe dump it
 // TODO: add usage of structs for state
 // TODO: remove nasty unwraps
+// TODO: add blink function
