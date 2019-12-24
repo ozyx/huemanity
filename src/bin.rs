@@ -11,8 +11,6 @@ use serde_json::{json, value::Value};
 
 fn main() {
     dotenv::dotenv().ok();
-    let ip = env::var("HUE_IP").unwrap();
-    let key = env::var("HUE_KEY").unwrap();
 
     let matches = clap_app!(myapp =>
         (version: "0.1.0")
@@ -26,7 +24,7 @@ fn main() {
     )
     .get_matches();
 
-    let bridge = Bridge::link(ip, key);
+    let mut bridge = Bridge::link();
 
     // resolve commands
     if let Some(matches) = matches.subcommand_matches("all") {
