@@ -19,12 +19,13 @@ pub struct Bridge {
     /// detect the light id's and is able to send new state to either
     /// a single light or all of the ones detected.
     ///
-    /// Currently to register a new bridge, you need to know 2 things:
-    /// - the internal IP of the bridge (in future i'll implement ssdp)
-    /// - the key assigned to you by the `api/newdeveloper` POST request
-    ///   see the documentation for the HUE API in order to see this.
-    ///   I will implement the authentication handshake request flow in
-    ///   the near future and in the CLI I will cache the key somewhere
+    /// Currently to register a new bridge, you need to know the internal IP of the bridge
+    /// on the network. If you know that use the register method to actually register a key
+    /// your app.
+    ///
+    /// If you already have a key and IP use the `link` method to create a bridge. However you
+    /// must make sure tha the HUE_IP and HUE_KEY environment variables are set or the `.env` file
+    /// in the executables directory has these variables set.
     ///
     pub ip: String,
     pub key: String,
