@@ -1,13 +1,14 @@
 [package]
 name = "huemanity"
-version = "0.1.2"
+version = "0.1.3b"
 authors = ["Finnkauski <iwiivi@gmail.com>"]
-description="A simple wrapper and CLI for the Phillips Hue lights."
+description="A simple wrapper and CLI for the Phillips Hue lights. Added registration, but you need to know the IP of the bridge."
 license="AGPL-3.0-or-later"
 homepage="https://github.com/finnkauski/huemanity"
 documentation="https://github.com/finnkauski/huemanity"
 repository="https://github.com/finnkauski/huemanity"
 edition="2018"
+readme="README.md"
 
 [dependencies]
 clap = "2.33.0"
