@@ -35,3 +35,5 @@ sending state to the lights.
    know your IP.
 2. This doesn't have fancy state serialisation or such as of this point. Wether
    or not this is in scope is debatable in my head.
+3. A lot of the `Result` Enums aren't handled correctly so the package is prone
+   to panic
