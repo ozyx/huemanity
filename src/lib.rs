@@ -19,13 +19,11 @@ pub struct Bridge {
     /// detect the light id's and is able to send new state to either
     /// a single light or all of the ones detected.
     ///
-    /// Currently to register a new bridge, you need to know the internal IP of the bridge
-    /// on the network. If you know that use the register method to actually register a key
-    /// your app.
-    ///
     /// If you already have a key and IP use the `link` method to create a bridge. However you
     /// must make sure tha the HUE_IP and HUE_KEY environment variables are set or the `.env` file
-    /// in the executables directory has these variables set.
+    /// in the executables directory has these variables set. If you don't have the key registered yet,
+    /// the link function will guide you through the process to register the key and save it to the
+    /// `.env` file that will be loaded by the CLI everytime.
     ///
     pub ip: String,
     pub key: String,
