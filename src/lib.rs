@@ -185,9 +185,9 @@ impl Bridge {
 
     /// Currently this function only prints out the light_ids, but there is scope in future
     /// for this to print out more. I will have to refactor the `collect_ids` into collect info
-    /// and serialize all the data about the ligths (perhaps except state which will change).
+    /// and serialize all the data about the lights (perhaps except state which will change).
     pub fn light_info(&self) {
-        // TODO: get info about the ligths and serialize all that along with the ids
+        // TODO: get info about the lights and serialize all that along with the ids
         // NOTE: will make this more useful as now you can't tell which light is which
         // TODO: make it sorted
         println!("Lights available on your bridge");
