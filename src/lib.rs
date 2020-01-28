@@ -1,6 +1,8 @@
+extern crate dirs;
 extern crate serde;
 extern crate serde_json;
 
+use dotenv;
 use reqwest::Client;
 use serde_json::value::Value;
 use std::collections::HashMap;
@@ -36,6 +38,9 @@ pub struct Bridge {
 impl Bridge {
     /// Discovers if a HUE_IP and HUE_KEY are available in the environment
     fn discover() -> Result<(String, String), Box<dyn Error>> {
+        let mut filename = dirs::home_dir().unwrap();
+        filename.push(".huemanity");
+        dotenv::from_filename(filename.to_str().unwrap())?;
         let ip = env::var("HUE_IP")?;
         let key = env::var("HUE_KEY")?;
         Ok((ip, key))
@@ -55,7 +60,7 @@ impl Bridge {
         let mut name = String::new();
 
         // Get user IP input and name for the app
-        println!("NOTE! Registration will create the `.env` containing IP and KEY info");
+        println!("NOTE! Registration will create the `~/.huemanity` containing IP and KEY info");
         println!("Enter the IP of your HUE bridge:");
         std::io::stdin().read_line(&mut ip)?;
         ip = ip.trim().to_string();
@@ -89,7 +94,11 @@ impl Bridge {
 
         let key = &response[0]["success"]["username"];
 
-        let mut file = File::create(".env")?;
+        // TODO Don't calculate this twice do it once pass it to register
+        let mut filename = dirs::home_dir().unwrap();
+        filename.push(".huemanity");
+
+        let mut file = File::create(filename.to_str().unwrap())?;
         file.write_all(format!("HUE_IP=\"{}\"\nHUE_KEY={}", ip, key).as_ref())?;
         println!(".env File successfully saved!");
 
