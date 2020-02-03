@@ -8,9 +8,11 @@ fn main() {
              (version: "0.1.0")
              (author: "Art Eidukas <iwiivi@gmail.com>")
              (about: "Given HUE bridge credentials, allows control over your HUE lights")
+             (@subcommand info =>
+                 (about: "Prints out the state of the lights that the bridge can detect")
+             )
              (@subcommand all =>
                  (about: "Sends commands to all lights")
-                 (version: "0.1.0")
                  (@arg STATE: -s --state +takes_value "Takes a string input representing a new state to send to ALL lights")
              )
          )
@@ -31,6 +33,8 @@ fn main() {
                 Err(e) => println!("Error in parsing state: {}", e),
             }
         }
+    } else if let Some(_) = matches.subcommand_matches("info") {
+        bridge.light_info();
     }
 }
 // TODO: add premate commands on the sendablestate
