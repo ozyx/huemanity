@@ -62,6 +62,13 @@ huemanity state "{\"on\":true}" 1
 huemanity state "{\"xy\":[1.0, 0.0]}" 1
 ```
 
+Even simpler, if you have a file with the state already recorded, you can do the
+following:
+
+```shell
+huemanity all $(cat file_with_state.json)
+```
+
 ## For more info:
 
 This follows closely (basically wraps) the interactions described in the
