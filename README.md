@@ -27,7 +27,7 @@ cd huemanity
 cargo install huemanity
 ```
 
-Installing from crates.io (might be outdated):
+Installing from [crates.io](https://crates.io/crates/huemanity) (might be outdated):
 
 ```shell
 cargo install huemanity
