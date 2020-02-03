@@ -29,6 +29,11 @@ Community is king!
 
 ### Install
 
+**Note**: At the moment I rely on the end user having `cargo` and rust compiler in
+order to install this. In future, once this tool has enough traction, release
+binaries will be compiled and maybe even provided through package managers. PR's
+will expedite this process!
+
 Installing the latest version:
 
 ```shell
@@ -45,7 +50,7 @@ cargo install huemanity
 
 ### Usage
 
-The simplest use case is passing a state to all lights.
+Here are a few simple use cases you might want to try once you have it installed:
 
 ```shell
 # get a state of the lights found on your bridge
