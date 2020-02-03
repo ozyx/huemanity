@@ -19,10 +19,11 @@ http = "0.1.21"
 dotenv = "0.15.0"
 dirs = "*"
 
+
 [lib]
 name = "huemanity"
 path = "src/lib.rs"
 
 [[bin]]
 name = "huemanity"
-path = "src/bin.rs"
+path = "src/bin/huemanity.rs"
