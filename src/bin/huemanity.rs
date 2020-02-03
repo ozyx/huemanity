@@ -11,9 +11,15 @@ fn main() {
              (@subcommand info =>
                  (about: "Prints out the state of the lights that the bridge can detect")
              )
+             (@subcommand state =>
+                 (about: "Prints out the state of the lights that the bridge can detect")
+                 (@arg STATE: +required "Takes a string input representing a new state to send to ALL lights")
+                 (@arg LIGHT: +required "You need to provide the numerical ID of the light")
+
+             )
              (@subcommand all =>
                  (about: "Sends commands to all lights")
-                 (@arg STATE: -s --state +takes_value "Takes a string input representing a new state to send to ALL lights")
+                 (@arg STATE: +required "Takes a string input representing a new state to send to ALL lights")
              )
          )
          .get_matches();
@@ -35,8 +41,28 @@ fn main() {
         }
     } else if let Some(_) = matches.subcommand_matches("info") {
         bridge.light_info();
+    } else if let Some(matches) = matches.subcommand_matches("state") {
+        let state = matches.value_of("STATE");
+        let light = matches.value_of("LIGHT");
+        // TODO: Can we tidy this up?
+        match (state, light) {
+            (Some(state), Some(light)) => {
+                match (
+                    serde_json::from_str::<SendableState>(state),
+                    light.parse::<u8>(),
+                ) {
+                    (Ok(sendablestate), Ok(lightid)) => {
+                        bridge.state(lightid, &sendablestate);
+                    }
+                    _ => (),
+                }
+            }
+            _ => (),
+        }
     }
 }
+
+// TODO: mapper between names or integer values to be kept in bridge
 // TODO: add premate commands on the sendablestate
 // TODO: implement the clap cli
 //     // TODO: add file tracking
