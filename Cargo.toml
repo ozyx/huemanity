@@ -1,6 +1,6 @@
 [package]
 name = "huemanity"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Finnkauski <iwiivi@gmail.com>"]
 description="A simple wrapper and CLI for the Phillips Hue lights. Added registration, but you need to know the IP of the bridge."
 license="AGPL-3.0-or-later"
