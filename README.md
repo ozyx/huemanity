@@ -15,6 +15,35 @@ to send state to each individual light.
 Bridge is assigned on your network. Once that is known you are able to register
 the application and send commands.
 
+## Usage
+
+### Install
+
+Installing the latest version:
+
+```shell
+git clone git@github.com:finnkauski/huemanity.git
+cd huemanity
+cargo install huemanity
+```
+
+Installing from crates.io (might be outdated):
+
+```shell
+cargo install huemanity
+```
+
+### Usage
+
+The simplest use case is passing a state to all lights.
+
+```shell
+# turn lights on
+huemanity all --state "{\"on\":true}"
+# change color
+huemanity all --state "{\"xy\":[1.0, 0.0]}"
+```
+
 ## For more info:
 
 This follows closely (basically wraps) the interactions described in the
