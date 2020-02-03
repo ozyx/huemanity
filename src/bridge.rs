@@ -217,8 +217,10 @@ impl Bridge {
 
     /// This is a simple method to show the lights in the terminal
     pub fn light_info(&self) {
-        // TODO: make it sorted
+        // TODO: make a macro to nice print
+        println!("--------------------------------");
         println!("Lights available on your bridge:");
+        println!("--------------------------------");
 
         let lights = self.lights.as_ref().unwrap();
         for (id, light) in lights.iter() {
