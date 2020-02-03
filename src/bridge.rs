@@ -109,7 +109,6 @@ impl Bridge {
     /// variables in the environment, it will try to guide you throught a registration
     /// process. In that case you will still need to know the IP of your Bridge.
     pub fn link() -> Self {
-        // TODO Don't calculate this twice do it once pass it to register
         let mut filename = dirs::home_dir().unwrap();
         filename.push(".huemanity");
         let path = filename.to_str().unwrap();
@@ -121,7 +120,6 @@ impl Bridge {
             Ok(tupl) => tupl,
             _ => {
                 println!("Unable to find required `HUE_KEY` and `HUE_IP` in environment!");
-                // TODO: can fail here, should check
                 let result = match Self::register(path) {
                     Ok(tupl) => {
                         println!("Registration successful");
@@ -158,7 +156,6 @@ impl Bridge {
     /// Sends the a request with set parameters to the HUE API endpoint
     /// This is a lower level function used primarily to send state.
     /// For more useful functions to look at: `Bridge.state` , `Bridge.state_all`
-    // TODO: solve the references above
     fn send(
         &self,
         endpoint: &str,

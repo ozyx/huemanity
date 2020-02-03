@@ -165,9 +165,9 @@ impl Default for SendableState {
     }
 }
 
-/// Super useful macro to create SendibleState
-/// Usage:
+/// Super useful macro to create `SendibleState`
 /// ```
+/// // Usage example
 /// let sendable_state: SendableState = state!(on: true, xy: [1.0, 0.0])
 /// ```
 #[macro_export]
