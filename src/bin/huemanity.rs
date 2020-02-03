@@ -12,14 +12,14 @@ fn main() {
                  (about: "Prints out the state of the lights that the bridge can detect")
              )
              (@subcommand state =>
-                 (about: "Prints out the state of the lights that the bridge can detect")
+                 (about: "Takes a string input (json, escaped quotes) of a new state and sends it to a given light")
                  (@arg STATE: +required "Takes a string input representing a new state to send to ALL lights")
                  (@arg LIGHT: +required "You need to provide the numerical ID of the light")
 
              )
              (@subcommand all =>
                  (about: "Sends commands to all lights")
-                 (@arg STATE: +required "Takes a string input representing a new state to send to ALL lights")
+                 (@arg STATE: +required "Takes a string input (json, escaped quotes) of a new state and sends it to all lights")
              )
          )
          .get_matches();
