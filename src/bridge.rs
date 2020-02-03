@@ -222,7 +222,7 @@ impl Bridge {
 
         let lights = self.lights.as_ref().unwrap();
         for (id, light) in lights.iter() {
-            println!("{}:\n{:?}", id, light);
+            println!("{}:{}", id, light);
         }
     }
 }

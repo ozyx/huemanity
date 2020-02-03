@@ -117,7 +117,7 @@ impl std::fmt::Display for Light {
             f,
             "
 Name: {}
-Is on: {:?}
+On: {:?}
 Color: {:?}
 ",
             self.name, self.state.on, self.state.xy
