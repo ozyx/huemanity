@@ -5,7 +5,7 @@
 A bare-bones package to control Phillips Hue lights written in Rust.
 
 This `CLI` and `crate` is designed to serialise and deserialise lights from the
-Philips Hue API.
+Philips Hue API and send state to the lights.
 
 The `CLI` is a bit underdeveloped at the moment, however the general `crate`
 works well. The central object (the `Bridge`) gets instantiated and is then able
@@ -22,10 +22,18 @@ This follows closely (basically wraps) the interactions described in the
 post](https://developers.meethue.com/develop/get-started-2/) up to the point of
 sending state to the lights.
 
-## Limitations and non-developments
+## Contributing
 
-- Currently it does not discover your bridge on the network and you need to
-  know your IP.
+If you would like to contribute here are a few things that need PRs:
+
+- The `Bridge.state_all` sequentially to each light, this needs a bit more
+  concurrency so requests get sent in one go. The `reqwest` library might have
+  an `async` client so that might need to be implemented.
+
+- The `CLI` needs a much better wrapping and functionality
+
+- I do not like that the end user needs to know the bridge ip address. Ideally
+  that would be automatically detected.
 
 ## Watch this development
 
