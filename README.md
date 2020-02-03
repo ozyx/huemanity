@@ -15,6 +15,11 @@ to send state to each individual light.
 Bridge is assigned on your network. Once that is known you are able to register
 the application and send commands.
 
+## Shoutout:
+
+Special thanks for the RustLang discord for helping when I needed support! ❤
+Community is king!
+
 ## Immediate TODO list:
 
 - Remote API flow. Allows you to control lights externally with a token.
