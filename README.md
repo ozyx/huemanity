@@ -48,10 +48,18 @@ cargo install huemanity
 The simplest use case is passing a state to all lights.
 
 ```shell
+# get a state of the lights found on your bridge
+huemanity info
+
 # turn lights on
-huemanity all --state "{\"on\":true}"
-# change color
-huemanity all --state "{\"xy\":[1.0, 0.0]}"
+huemanity all "{\"on\":true}"
+# change color of all lights
+huemanity all "{\"xy\":[1.0, 0.0]}"
+
+# turn a light on
+huemanity state "{\"on\":true}" 1
+# change color of a given light
+huemanity state "{\"xy\":[1.0, 0.0]}" 1
 ```
 
 ## For more info:
