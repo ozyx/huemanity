@@ -4,7 +4,7 @@ extern crate serde_json;
 use huemanity::{bridge::*, lightstructs::*};
 
 fn main() {
-    let matches = clap_app!(myapp =>
+    let matches = clap_app!(huemanity =>
              (version: "0.1.0")
              (author: "Art Eidukas <iwiivi@gmail.com>")
              (about: "Given HUE bridge credentials, allows control over your HUE lights")
