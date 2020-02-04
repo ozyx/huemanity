@@ -142,13 +142,15 @@ impl Bridge {
             lights: None,
         };
 
+        // inform user we're connected
+        println!("Connected to:\n{}", bridge);
+
         // collect the lights into the bridge
         match bridge.collect_lights() {
             Ok(_) => println!("Collected lights sucessfully!"),
             Err(e) => println!("Could not collect lights: {}", e),
         }
 
-        println!("Connected to:\n{}", bridge);
         println!("Found {} lights", bridge.n_lights);
         bridge
     }
