@@ -21,6 +21,9 @@ fn main() {
                  (about: "Sends commands to all lights")
                  (@arg STATE: +required "Takes a string input (json, escaped quotes) of a new state and sends it to all lights")
              )
+             (@subcommand debug =>
+                 (about: "Send a get request to the bridge and return the raw response")
+             )
          )
          .get_matches();
 
@@ -52,13 +55,17 @@ fn main() {
                     light.parse::<u8>(),
                 ) {
                     (Ok(sendablestate), Ok(lightid)) => {
-                        bridge.state(lightid, &sendablestate);
+                        if let Err(e) = bridge.state(lightid, &sendablestate) {
+                            println!("Could not send state to light: {}", e);
+                        }
                     }
                     _ => (),
                 }
             }
             _ => (),
         }
+    } else if let Some(_) = matches.subcommand_matches("debug") {
+        bridge.debug();
     }
 }
 

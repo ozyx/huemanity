@@ -174,6 +174,18 @@ impl Bridge {
         Ok(response)
     }
 
+    /// Gets the raw response to the user
+    pub fn debug(&self) {
+        match self.send("lights", RequestType::Get, None) {
+            Ok(mut resp) => {
+                dbg!(resp.text().unwrap());
+            }
+            Err(e) => {
+                println!("Could not send the get request: {}", e);
+            }
+        };
+    }
+
     /// Given a light and a required state, send this state to the light.
     pub fn state(
         &self,
