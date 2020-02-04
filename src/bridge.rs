@@ -246,6 +246,6 @@ impl Bridge {
 
 impl fmt::Display for Bridge {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        write!(f, "bridge: {}\nlights: {:?}", self.ip, self.light_ids)
+        write!(f, "bridge: {}", self.ip)
     }
 }
