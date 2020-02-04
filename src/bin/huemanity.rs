@@ -3,6 +3,9 @@ extern crate clap;
 extern crate serde_json;
 use huemanity::{bridge::*, lightstructs::*};
 
+// ssdp
+extern crate ssdp;
+
 fn main() {
     let matches = clap_app!(huemanity =>
              (version: "0.1.0")
@@ -23,6 +26,12 @@ fn main() {
              )
              (@subcommand debug =>
                  (about: "Send a get request to the bridge and return the raw response")
+             )
+             (@subcommand search =>
+                 (about: "Search for a bridge and print out the IP of the bridge")
+             )
+             (@subcommand discover =>
+                 (about: "Discover the bridges on the network (NOTE: EXPERIMENTAL)")
              )
          )
          .get_matches();
@@ -66,6 +75,8 @@ fn main() {
         }
     } else if let Some(_) = matches.subcommand_matches("debug") {
         bridge.debug();
+    } else if let Some(_) = matches.subcommand_matches("discover") {
+        discover();
     }
 }
 
@@ -75,7 +86,6 @@ fn main() {
 //     // TODO: add file tracking
 // TODO: make command sending async as this is quite inconsistent -> prerelease reqwests // Use stream
 // TODO: add translation of color spaces to whatever the format in the API states
-// TODO: add ssdp ip detection
 // TODO: add a nice way to print out information about the system or lights and maybe dump it
 // TODO: add usage of structs for state
 // TODO: remove nasty unwraps

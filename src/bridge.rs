@@ -249,3 +249,30 @@ impl fmt::Display for Bridge {
         write!(f, "bridge: {}", self.ip)
     }
 }
+
+/// Discovers bridge IPs on the networks using SSDP
+pub fn discover() {
+    println!("Searching for bridges...");
+    use ssdp::header::{HeaderMut, Man, MX, ST};
+    use ssdp::message::{Multicast, SearchRequest};
+
+    // Create Our Search Request
+    let mut request = SearchRequest::new();
+
+    // Set Our Desired Headers (Not Verified By The Library)
+    request.set(Man);
+    request.set(MX(5));
+    request.set(ST::Target(ssdp::FieldMap::URN(
+        "urn:schemas-upnp-org:device:Basic:1".into(),
+    )));
+
+    let mut bridges = Vec::new();
+    // Iterate Over Streaming Responses
+    for (_, src) in request.multicast().unwrap() {
+        let ip = src.ip().to_string();
+        if !bridges.contains(&ip) {
+            bridges.push(ip)
+        }
+    }
+    println!("Found the following bridges: {:?}", bridges);
+}

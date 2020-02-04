@@ -72,6 +72,9 @@ huemanity state "{\"xy\":[1.0, 0.0]}" 1
 
 # get request sent to bridge and state printed out
 huemanity debug
+
+# discover bridges on the network (experimental)
+huemanity discover
 ```
 
 Even simpler, if you have a file with the state already recorded, you can do the
