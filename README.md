@@ -15,6 +15,9 @@ to send state to each individual light.
 Bridge is assigned on your network. Once that is known you are able to register
 the application and send commands.
 
+**NOTE:** It is not unexpected that there will be early snags with different
+lights. So if you do get a bug, please report it. I should be right on it.
+
 ## Shoutout:
 
 Special thanks for the RustLang discord for helping when I needed support! ❤
