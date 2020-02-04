@@ -37,41 +37,23 @@ pub struct Bridge {
 }
 
 impl Bridge {
-    /// Discovers if a `HUE_IP` and `HUE_KEY` are available in the environment
-    fn discover(filename: &str) -> Result<(String, String), Box<dyn Error>> {
+    /// Detects if a `HUE_IP` and `HUE_KEY` are available in the environment
+    fn detect(filename: &str) -> Result<(String, String), Box<dyn Error>> {
         dotenv::from_filename(filename)?;
         let ip = env::var("HUE_IP")?;
         let key = env::var("HUE_KEY")?;
         Ok((ip, key))
     }
-
-    /// Register the Bridge and save credentials to `~/.huemanity` file
-    /// Can be used as a standalone function to get a key registered
-    /// if you know the IP of your Bridge, but generally is a helper for
-    /// the `link` method.
-    pub fn register(configpath: &str) -> Result<(String, String), Box<dyn Error>> {
-        // TODO: currently uses file writting rather than some more clever serialisation and checking
-        // TODO: could also take an optional setting string or config path ?
-        // TODO: write a serialisation (serde) so one can load the bridge from config
-        let client = Client::new();
-        let mut ip = String::new();
-        let mut name = String::new();
-
-        // Get user IP input and name for the app
-        println!("NOTE! Registration will create the `~/.huemanity` containing IP and KEY info");
-        println!("Enter the IP of your HUE bridge:");
-        std::io::stdin().read_line(&mut ip)?;
-        ip = ip.trim().to_string();
-
-        println!("Enter the desired app name:");
-        std::io::stdin().read_line(&mut name)?;
-        name = name.trim().to_string();
-
-        // only use json! here because its a one of and writing serialisation for it is pointless
-        let body = serde_json::json!({ "devicetype": format!("{}", name) });
-        let ping_it = || -> Value {
+    /// Waits for a button to be pressed on a given bridge or several bridges
+    fn wait_for_button(
+        body: Value,
+        ip: Option<&String>,
+        ips: Option<Vec<String>>,
+        client: Client,
+    ) -> (String, String) {
+        let ping_it = |i: &String| -> Value {
             client
-                .post(&format!("http://{}/api", ip))
+                .post(&format!("http://{}/api", i))
                 .json(&body)
                 .send()
                 .unwrap()
@@ -79,23 +61,100 @@ impl Bridge {
                 .unwrap()
         };
 
-        let mut response = ping_it();
+        match (ip, ips) {
+            (Some(bridge_ip), _) => {
+                let mut response = ping_it(&bridge_ip);
 
-        loop {
-            if response[0]["error"]["type"] == 101 {
-                println!("Please press the hub button!");
-                sleep(Duration::from_secs(5));
-                response = ping_it();
-            } else {
-                break;
+                loop {
+                    if response[0]["error"]["type"] == 101 {
+                        println!("Please press the hub button!");
+                        sleep(Duration::from_secs(5));
+                        response = ping_it(&bridge_ip);
+                    } else {
+                        break;
+                    }
+                }
+
+                (
+                    bridge_ip.to_string(),
+                    response[0]["success"]["username"].to_string(),
+                )
             }
+            (None, Some(ips)) => {
+                let mut response: Value = Value::Bool(true);
+                let mut bridge_ip = String::new();
+                loop {
+                    println!("Please press the hub button!");
+                    sleep(Duration::from_secs(5));
+                    for ip in &ips {
+                        response = ping_it(&ip);
+                        if response[0]["error"]["type"] == 101 {
+                            continue;
+                        } else {
+                            bridge_ip.push_str(ip);
+                            break;
+                        }
+                    }
+                    if response[0]["error"]["type"] != 101 {
+                        break;
+                    }
+                }
+
+                (bridge_ip, response[0]["success"]["username"].to_string())
+            }
+            (None, None) => panic!("No bridges to wait for button"),
+        }
+    }
+    /// Register the Bridge and save credentials to `~/.huemanity` file
+    /// Can be used as a standalone function to get a key registered
+    /// if you know the IP of your Bridge, but generally is a helper for
+    /// the `link` method.
+    pub fn register(configpath: &str) -> Result<(String, String), Box<dyn Error>> {
+        // TODO: currently uses file writting rather than some more clever serialisation and checking
+        // TODO: could also take an optional setting string or config path ?
+
+        // TODO: write a serialisation (serde) so one can load the bridge from config
+        // Get user IP input and name for the app
+        println!("NOTE! Registration will create the `~/.huemanity` containing IP and KEY info");
+        let client = Client::new();
+        let mut ip = String::new();
+        let mut name = String::new();
+
+        // Try to find bridges through ssdp
+        let bridges = discover();
+
+        println!("Enter the desired app name (default: huemanity):");
+        std::io::stdin().read_line(&mut name)?;
+        if name == "" {
+            name = "huemanity".to_owned();
+        } else {
+            name = name.trim().to_string();
         }
 
-        let key = &response[0]["success"]["username"];
+        // only use json! here because its a one of and writing serialisation for it is pointless
+        let body = serde_json::json!({ "devicetype": format!("{}", name) });
+
+        // Deal with the cases where:
+        // - bridge ip is not found
+        // - mutliple bridges found
+        // - one bridge found
+        let (ip, key) = if bridges.len() > 1 {
+            println!("No bridges automatically detected.\nEnter the IP of your HUE bridge (default: huemanity):");
+            std::io::stdin().read_line(&mut ip)?;
+            // TODO: use IP struct form net::sockaddr
+            ip = ip.trim().to_string();
+            Self::wait_for_button(body, Some(&ip), None, client)
+        } else {
+            println!(
+                "Bridges found: {:?} Will try to connect to all of them sequentially...",
+                &bridges
+            );
+            Self::wait_for_button(body, None, Some(bridges), client)
+        };
 
         let mut file = File::create(configpath)?;
-        file.write_all(format!("HUE_IP=\"{}\"\nHUE_KEY={}", ip, key).as_ref())?;
-        println!(".env File successfully saved!");
+        file.write_all(format!("HUE_IP=\"{}\"\nHUE_KEY={}", &ip, key).as_ref())?;
+        println!(".huemanity File successfully saved!");
 
         // TODO: hacky replace
         Ok((ip, key.to_string().replace("\"", "")))
@@ -116,7 +175,7 @@ impl Bridge {
         let client = Client::new();
 
         // discovery of IP and registration logic
-        let (ip, key) = match Self::discover(path) {
+        let (ip, key) = match Self::detect(path) {
             Ok(tupl) => tupl,
             _ => {
                 println!("Unable to find required `HUE_KEY` and `HUE_IP` in environment!");
@@ -251,7 +310,7 @@ impl fmt::Display for Bridge {
 }
 
 /// Discovers bridge IPs on the networks using SSDP
-pub fn discover() {
+pub fn discover() -> Vec<String> {
     println!("Searching for bridges...");
     use ssdp::header::{HeaderMut, Man, MX, ST};
     use ssdp::message::{Multicast, SearchRequest};
@@ -274,5 +333,14 @@ pub fn discover() {
             bridges.push(ip)
         }
     }
-    println!("Found the following bridges: {:?}", bridges);
+    bridges
+}
+
+/// Removes the `~/.huemanity` file
+pub fn cleanup() -> std::io::Result<()> {
+    // TODO: ideally remove this unwrap
+    let mut filename = dirs::home_dir().unwrap();
+    filename.push(".huemanity");
+    std::fs::remove_file(filename)?;
+    Ok(())
 }

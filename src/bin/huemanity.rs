@@ -33,10 +33,11 @@ fn main() {
              (@subcommand discover =>
                  (about: "Discover the bridges on the network (NOTE: EXPERIMENTAL)")
              )
+             (@subcommand clean =>
+                 (about: "Cleanup the `~/.huemanity` file")
+             )
          )
          .get_matches();
-
-    let bridge = Bridge::link();
 
     // resolve commands
     if let Some(matches) = matches.subcommand_matches("all") {
@@ -44,6 +45,7 @@ fn main() {
             let parsed = serde_json::from_str::<SendableState>(jsn);
             match parsed {
                 Ok(state) => {
+                    let bridge = Bridge::link();
                     if let Err(e) = bridge.state_all(&state) {
                         println!("Could not send state: {}", e);
                     };
@@ -52,6 +54,7 @@ fn main() {
             }
         }
     } else if let Some(_) = matches.subcommand_matches("info") {
+        let bridge = Bridge::link();
         bridge.light_info();
     } else if let Some(matches) = matches.subcommand_matches("state") {
         let state = matches.value_of("STATE");
@@ -64,6 +67,7 @@ fn main() {
                     light.parse::<u8>(),
                 ) {
                     (Ok(sendablestate), Ok(lightid)) => {
+                        let bridge = Bridge::link();
                         if let Err(e) = bridge.state(lightid, &sendablestate) {
                             println!("Could not send state to light: {}", e);
                         }
@@ -74,12 +78,21 @@ fn main() {
             _ => (),
         }
     } else if let Some(_) = matches.subcommand_matches("debug") {
+        let bridge = Bridge::link();
         bridge.debug();
+
+    // NOTE: The following subcommands don't need a bridge
     } else if let Some(_) = matches.subcommand_matches("discover") {
-        discover();
+        println!("Discovered bridges on the following IPs: {:?}", discover());
+    } else if let Some(_) = matches.subcommand_matches("clean") {
+        match cleanup() {
+            Ok(_) => println!("Cleaned up!"),
+            Err(e) => println!("Could not clean up because: {}", e),
+        }
     }
 }
 
+// TODO: stop printing the bloody bridge thing every time
 // TODO: mapper between names or integer values to be kept in bridge
 // TODO: add premate commands on the sendablestate
 // TODO: implement the clap cli
@@ -90,3 +103,4 @@ fn main() {
 // TODO: add usage of structs for state
 // TODO: remove nasty unwraps
 // TODO: add blink function
+// TODO: Refactor CLI
