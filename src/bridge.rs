@@ -153,7 +153,7 @@ impl Bridge {
             Self::wait_for_button(body, Some(&ip), None, client)
         } else {
             println!(
-                "Bridges found: {:?} Will try to connect to all of them sequentially...",
+                "Bridge(s) found: {:?} Will try to connect to all of them sequentially...",
                 &bridges
             );
             Self::wait_for_button(body, None, Some(bridges), client)
