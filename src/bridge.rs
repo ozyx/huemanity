@@ -51,6 +51,7 @@ impl Bridge {
         ips: Option<Vec<String>>,
         client: Client,
     ) -> (String, String) {
+        // needed to avoid repetition of code
         let ping_it = |i: &String| -> Value {
             client
                 .post(&format!("http://{}/api", i))
@@ -61,6 +62,9 @@ impl Bridge {
                 .unwrap()
         };
 
+        // main logic. basically if you provide a single ip, it will
+        // attempt to register to that
+        // otherwise it will try to loop through the ips
         match (ip, ips) {
             (Some(bridge_ip), _) => {
                 let mut response = ping_it(&bridge_ip);
@@ -86,6 +90,9 @@ impl Bridge {
                 loop {
                     println!("Please press the hub button!");
                     sleep(Duration::from_secs(5));
+                    // this chunk of code basically will loop through
+                    // all the ips and check if any of them have the button
+                    // pressed
                     for ip in &ips {
                         response = ping_it(&ip);
                         if response[0]["error"]["type"] == 101 {
@@ -102,7 +109,7 @@ impl Bridge {
 
                 (bridge_ip, response[0]["success"]["username"].to_string())
             }
-            (None, None) => panic!("No bridges to wait for button"),
+            (None, None) => panic!("No ips provided in order to wait for a button press!"),
         }
     }
     /// Register the Bridge and save credentials to `~/.huemanity` file
