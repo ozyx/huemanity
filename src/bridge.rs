@@ -179,7 +179,7 @@ impl Bridge {
         match self.send("lights", RequestType::Get, None) {
             Ok(mut resp) => {
                 let r: Value = resp.json().unwrap();
-                dbg!(r);
+                println!("{}", serde_json::to_string_pretty(&r).unwrap());
             }
             Err(e) => {
                 println!("Could not send the get request: {}", e);
