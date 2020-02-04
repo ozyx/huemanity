@@ -178,7 +178,8 @@ impl Bridge {
     pub fn debug(&self) {
         match self.send("lights", RequestType::Get, None) {
             Ok(mut resp) => {
-                dbg!(resp.text().unwrap());
+                let r: Value = resp.json().unwrap();
+                dbg!(r);
             }
             Err(e) => {
                 println!("Could not send the get request: {}", e);
