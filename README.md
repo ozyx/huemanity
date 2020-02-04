@@ -42,7 +42,7 @@ Installing the latest version:
 ```shell
 git clone git@github.com:finnkauski/huemanity.git
 cd huemanity
-cargo install huemanity
+cargo install --path .
 ```
 
 Installing from [crates.io](https://crates.io/crates/huemanity) (might be outdated):
