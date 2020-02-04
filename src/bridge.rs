@@ -53,7 +53,7 @@ impl Bridge {
         // TODO: currently uses file writting rather than some more clever serialisation and checking
         // TODO: could also take an optional setting string or config path ?
         // TODO: write a serialisation (serde) so one can load the bridge from config
-        let _client = Client::new();
+        let client = Client::new();
         let mut ip = String::new();
         let mut name = String::new();
 
@@ -70,7 +70,7 @@ impl Bridge {
         // only use json! here because its a one of and writing serialisation for it is pointless
         let body = serde_json::json!({ "devicetype": format!("{}", name) });
         let ping_it = || -> Value {
-            _client
+            client
                 .post(&format!("http://{}/api", ip))
                 .json(&body)
                 .send()
