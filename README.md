@@ -68,6 +68,10 @@ huemanity all "{\"xy\":[1.0, 0.0]}"
 huemanity state "{\"on\":true}" 1
 # change color of a given light
 huemanity state "{\"xy\":[1.0, 0.0]}" 1
+
+
+# get request sent to bridge and state printed out
+huemanity debug
 ```
 
 Even simpler, if you have a file with the state already recorded, you can do the
