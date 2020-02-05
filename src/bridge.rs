@@ -145,7 +145,7 @@ impl Bridge {
         // - bridge ip is not found
         // - mutliple bridges found
         // - one bridge found
-        let (ip, key) = if bridges.len() > 0 {
+        let (ip, key) = if bridges.len() = 0 {
             println!("No bridges automatically detected.\nEnter the IP of your HUE bridge (default: huemanity):");
             std::io::stdin().read_line(&mut ip)?;
             // TODO: use IP struct form net::sockaddr
