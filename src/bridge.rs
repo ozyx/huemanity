@@ -41,10 +41,18 @@ pub struct Bridge {
 }
 
 /// Initialize the logger.
-/// 
+///
 /// TODO: elaborate.
-/// 
+///
 pub fn init_logger() {
+    // Open logfile in append mode, create it if it doesn't exist
+    let logfile = OpenOptions::new()
+        .read(true)
+        .write(true)
+        .append(true)
+        .create(true)
+        .open("huemanity.log")
+        .unwrap();
     CombinedLogger::init(vec![
         TermLogger::new(
             LevelFilter::Info,
@@ -55,17 +63,7 @@ pub fn init_logger() {
             TerminalMode::Stdout,
         )
         .unwrap(),
-        // FIXME: log doesnt append between commands
-        WriteLogger::new(
-            LevelFilter::Info,
-            Config::default(),
-            OpenOptions::new()
-                .read(true)
-                .write(true)
-                .create(true)
-                .open("huemanity.log")
-                .unwrap(),
-        ),
+        WriteLogger::new(LevelFilter::Info, Config::default(), logfile),
     ])
     .unwrap();
 }
