@@ -114,9 +114,8 @@ impl Bridge {
     }
     /// Register the Bridge and save credentials to `~/.huemanity` file
     /// Can be used as a standalone function to get a key registered
-    /// if you know the IP of your Bridge, but generally is a helper for
-    /// the `link` method.
-    pub fn register(configpath: &str) -> Result<(String, String), Box<dyn Error>> {
+    /// but the main use of this is through the `link` method.
+    fn register(configpath: &str) -> Result<(String, String), Box<dyn Error>> {
         // TODO: currently uses file writting rather than some more clever serialisation and checking
         // TODO: could also take an optional setting string or config path ?
 
@@ -173,7 +172,15 @@ impl Bridge {
     /// If you have `HUE_IP` and `HUE_KEY` in your environment this will
     /// just proceed as normal linking to the bridge. If you don't have these
     /// variables in the environment, it will try to guide you throught a registration
-    /// process. In that case you will still need to know the IP of your Bridge.
+    /// process.
+    ///
+    /// It will attempt to find bridges on your network using UPnP. If it can't you will need
+    /// to know the IP of your bridge and input it. If you have multiple bridges on the network
+    /// it will try to connect to all of them until it finds one with a pressed Hub button.
+    ///
+    /// As part of the registration process it will also ask you for an app name. It is not
+    /// really important what it is as it is used as an application identifier when you are
+    /// trying to see which apps have been registered on your bridge.
     pub fn link() -> Self {
         let mut filename = dirs::home_dir().unwrap();
         filename.push(".huemanity");
@@ -284,7 +291,7 @@ impl Bridge {
     /// - light_ids
     /// - n_lights
     /// - lights
-    pub fn collect_lights(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+    fn collect_lights(&mut self) -> Result<(), Box<dyn std::error::Error>> {
         // get the lights state
         let lights: Lights = self.send("lights", RequestType::Get, None)?.json()?;
 

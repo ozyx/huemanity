@@ -104,3 +104,4 @@ fn main() {
 // TODO: remove nasty unwraps
 // TODO: add blink function
 // TODO: Refactor CLI
+// TODO: implement more serialisation things like XY vs HS etc.
