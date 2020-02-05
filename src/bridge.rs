@@ -1,12 +1,16 @@
 use crate::lightstructs::*;
 use dotenv;
+
+use log::Level;
 use reqwest::Client;
 use serde_json::value::Value;
+use simplelog::*;
 use std::collections::BTreeMap;
 use std::env;
 use std::error::Error;
 use std::fmt;
 use std::fs::File;
+use std::fs::OpenOptions;
 use std::io::prelude::*;
 use std::thread::sleep;
 use std::time::Duration;
@@ -34,6 +38,36 @@ pub struct Bridge {
     pub light_ids: Vec<u8>,
     pub n_lights: u8,
     pub lights: Option<Lights>,
+}
+
+/// Initialize the logger.
+/// 
+/// TODO: elaborate.
+/// 
+pub fn init_logger() {
+    CombinedLogger::init(vec![
+        TermLogger::new(
+            LevelFilter::Info,
+            ConfigBuilder::new()
+                .set_time_level(LevelFilter::Off)
+                .set_max_level(LevelFilter::Off)
+                .build(),
+            TerminalMode::Stdout,
+        )
+        .unwrap(),
+        // FIXME: log doesnt append between commands
+        WriteLogger::new(
+            LevelFilter::Info,
+            Config::default(),
+            OpenOptions::new()
+                .read(true)
+                .write(true)
+                .create(true)
+                .open("huemanity.log")
+                .unwrap(),
+        ),
+    ])
+    .unwrap();
 }
 
 impl Bridge {
@@ -71,7 +105,7 @@ impl Bridge {
 
                 loop {
                     if response[0]["error"]["type"] == 101 {
-                        println!("Please press the hub button!");
+                        info!("Please press the hub button!");
                         sleep(Duration::from_secs(5));
                         response = ping_it(&bridge_ip);
                     } else {
@@ -88,7 +122,7 @@ impl Bridge {
                 let mut response: Value = Value::Bool(true);
                 let mut bridge_ip = String::new();
                 loop {
-                    println!("Please press the hub button!");
+                    info!("Please press the hub button!");
                     sleep(Duration::from_secs(5));
                     // this chunk of code basically will loop through
                     // all the ips and check if any of them have the button
@@ -121,7 +155,7 @@ impl Bridge {
 
         // TODO: write a serialisation (serde) so one can load the bridge from config
         // Get user IP input and name for the app
-        println!("NOTE! Registration will create the `~/.huemanity` containing IP and KEY info");
+        info!("NOTE! Registration will create the `~/.huemanity` containing IP and KEY info");
         let client = Client::new();
         let mut ip = String::new();
         let mut name = String::new();
@@ -129,7 +163,7 @@ impl Bridge {
         // Try to find bridges through ssdp
         let bridges = discover();
 
-        println!("Enter the desired app name (default: huemanity):");
+        info!("Enter the desired app name (default: huemanity):");
         std::io::stdin().read_line(&mut name)?;
         if name == "" {
             name = "huemanity".to_owned();
@@ -145,13 +179,13 @@ impl Bridge {
         // - mutliple bridges found
         // - one bridge found
         let (ip, key) = if bridges.len() == 0 {
-            println!("No bridges automatically detected.\nEnter the IP of your HUE bridge (default: huemanity):");
+            info!("No bridges automatically detected.\nEnter the IP of your HUE bridge (default: huemanity):");
             std::io::stdin().read_line(&mut ip)?;
             // TODO: use IP struct form net::sockaddr
             ip = ip.trim().to_string();
             Self::wait_for_button(body, Some(&ip), None, client)
         } else {
-            println!(
+            info!(
                 "Bridge(s) found: {:?} Will try to connect to all of them sequentially...",
                 &bridges
             );
@@ -160,7 +194,7 @@ impl Bridge {
 
         let mut file = File::create(configpath)?;
         file.write_all(format!("HUE_IP=\"{}\"\nHUE_KEY={}", &ip, key).as_ref())?;
-        println!(".huemanity File successfully saved!");
+        info!(".huemanity File successfully saved!");
 
         // TODO: hacky replace
         Ok((ip, key.to_string().replace("\"", "")))
@@ -182,6 +216,7 @@ impl Bridge {
     /// really important what it is as it is used as an application identifier when you are
     /// trying to see which apps have been registered on your bridge.
     pub fn link() -> Self {
+        init_logger();
         let mut filename = dirs::home_dir().unwrap();
         filename.push(".huemanity");
         let path = filename.to_str().unwrap();
@@ -192,10 +227,10 @@ impl Bridge {
         let (ip, key) = match Self::detect(path) {
             Ok(tupl) => tupl,
             _ => {
-                println!("Unable to find required `HUE_KEY` and `HUE_IP` in environment!");
+                info!("Unable to find required `HUE_KEY` and `HUE_IP` in environment!");
                 let result = match Self::register(path) {
                     Ok(tupl) => {
-                        println!("Registration successful");
+                        info!("Registration successful");
                         tupl
                     }
                     Err(e) => panic!("Could not register due to: {}", e),
@@ -216,15 +251,15 @@ impl Bridge {
         };
 
         // inform user we're connected
-        println!("Connected to:\n{}", bridge);
+        info!("Connected to:\n {}", bridge);
 
         // collect the lights into the bridge
         match bridge.collect_lights() {
-            Ok(_) => println!("Collected lights sucessfully!"),
-            Err(e) => println!("Could not collect lights: {}", e),
+            Ok(_) => info!("Collected lights sucessfully!"),
+            Err(e) => info!("Could not collect lights: {}", e),
         }
 
-        println!("Found {} lights", bridge.n_lights);
+        info!("Found {} lights", bridge.n_lights);
         bridge
     }
 
@@ -252,10 +287,10 @@ impl Bridge {
         match self.send("lights", RequestType::Get, None) {
             Ok(mut resp) => {
                 let r: Value = resp.json().unwrap();
-                println!("{}", serde_json::to_string_pretty(&r).unwrap());
+                info!("{}", serde_json::to_string_pretty(&r).unwrap());
             }
             Err(e) => {
-                println!("Could not send the get request: {}", e);
+                error!("Could not send the get request: {}", e);
             }
         };
     }
@@ -268,11 +303,21 @@ impl Bridge {
     ) -> Result<(), Box<dyn std::error::Error>> {
         // TODO: Implement a threadpool solution where the pool is owned by the bridge and you
         // send light commands through that.
-        self.send(
+        match self.send(
             &format!("lights/{}/state", light),
             RequestType::Put,
             Some(state),
-        )?;
+        ) {
+            Ok(response) => match response.status() {
+                reqwest::StatusCode::OK => {
+                    info!("Light #{} received new state successfully", light)
+                }
+                _ => warn!("Bad response from bridge!"),
+            },
+            Err(e) => {
+                error!("Error received: {}", e);
+            }
+        }
         Ok(())
     }
 
@@ -306,13 +351,13 @@ impl Bridge {
     /// This is a simple method to show the lights in the terminal
     pub fn light_info(&self) {
         // TODO: make a macro to nice print
-        println!("--------------------------------");
-        println!("Lights available on your bridge:");
-        println!("--------------------------------");
+        info!("--------------------------------");
+        info!("Lights available on your bridge:");
+        info!("--------------------------------");
 
         let lights = self.lights.as_ref().unwrap();
         for (id, light) in lights.iter() {
-            println!("{}:{}", id, light);
+            info!("{}:{}", id, light);
         }
     }
 }
@@ -325,7 +370,7 @@ impl fmt::Display for Bridge {
 
 /// Discovers bridge IPs on the networks using SSDP
 pub fn discover() -> Vec<String> {
-    println!("Searching for bridges...");
+    info!("Searching for bridges...");
     use ssdp::header::{HeaderMut, Man, MX, ST};
     use ssdp::message::{Multicast, SearchRequest};
 

@@ -19,6 +19,8 @@ http = "0.1.21"
 dotenv = "0.15.0"
 dirs = "2.0.2"
 ssdp = "0.7.0"
+log = "0.4.8"
+simplelog = "0.7.4"
 
 
 [lib]
